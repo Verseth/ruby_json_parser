@@ -199,7 +199,8 @@ module RubyJsonParser
       while true
         break unless Token::DIGITS.include?(peek_char)
 
-        advance_char
+        _, ok = advance_char
+        break unless ok
       end
     end
 
