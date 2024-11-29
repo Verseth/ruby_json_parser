@@ -1,6 +1,6 @@
 # RubyJsonParser
 
-This library implements a JSON lexer and parser in pure Ruby 💎.
+This library implements a JSON lexer, parser and evaluator in pure Ruby 💎.
 
 It has been built for educational purposes, to serve as a simple example of what makes parsers tick.
 
