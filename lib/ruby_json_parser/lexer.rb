@@ -21,7 +21,7 @@ module RubyJsonParser
 
     sig { returns(Token) }
     def next
-      return Token.new(:end_of_file) unless has_more_tokens?
+      return Token.new(Token::END_OF_FILE) unless more_tokens?
 
       scan_token
     end
@@ -43,7 +43,7 @@ module RubyJsonParser
     private
 
     sig { returns(T::Boolean) }
-    def has_more_tokens?
+    def more_tokens?
       @cursor < @source.length
     end
 
@@ -65,7 +65,7 @@ module RubyJsonParser
 
     sig { returns([String, T::Boolean]) }
     def advance_char
-      return '', false unless has_more_tokens?
+      return '', false unless more_tokens?
 
       char = next_char
 
@@ -82,7 +82,7 @@ module RubyJsonParser
     # without incrementing the cursor.
     sig { returns(String) }
     def peek_char
-      return '' unless has_more_tokens?
+      return '' unless more_tokens?
 
       char, = next_char
       char
@@ -103,7 +103,7 @@ module RubyJsonParser
     # the next UTF-8 encoded character in source code.
     # If they match, the cursor gets incremented.
     def match_char(char)
-      return false unless has_more_tokens?
+      return false unless more_tokens?
 
       if peek_char == char
         advance_char
@@ -116,7 +116,7 @@ module RubyJsonParser
     # Consumes the next character if it's from the valid set.
     sig { params(valid_chars: String).returns(T::Boolean) }
     def match_chars(valid_chars)
-      return false unless has_more_tokens?
+      return false unless more_tokens?
 
       if valid_chars.include?(peek_char)
         advance_char
@@ -207,7 +207,6 @@ module RubyJsonParser
     # Checks if the next `n` characters are from the valid set.
     sig { params(valid_chars: String, n: Integer).returns(T::Boolean) }
     def accept_chars(valid_chars, n)
-      i = 0
       result = T.let(true, T::Boolean)
       n.times do
         unless match_chars(valid_chars)
@@ -225,7 +224,8 @@ module RubyJsonParser
     def scan_number(init_char)
       if init_char == '0'
         p = peek_char
-        unless p == '.'
+        if accept_chars(Token::DIGITS, 1)
+          consume_digits
           return token(
             Token::ERROR,
             "unexpected char in number literal: #{p.inspect}, expected '.'"
@@ -262,6 +262,15 @@ module RubyJsonParser
       token_with_consumed_value(Token::NUMBER)
     end
 
+    sig { void }
+    def swallow_rest_of_the_string
+      while true
+        # swallow the rest of the string
+        ch, more_tokens = advance_char
+        break if !more_tokens || ch == '"'
+      end
+    end
+
     sig { returns(Token) }
     def scan_string
       value_buffer = String.new
@@ -296,12 +305,18 @@ module RubyJsonParser
         when 't'
           value_buffer << "\t"
         when 'u'
-          return Token.new(Token::ERROR, 'invalid unicode escape') unless accept_chars(Token::HEX_DIGITS, 4)
+          unless accept_chars(Token::HEX_DIGITS, 4)
+            swallow_rest_of_the_string
+            return Token.new(Token::ERROR, 'invalid unicode escape')
+          end
 
           advance_chars(4)
           last4 = T.must @source[@cursor - 4...@cursor]
           value_buffer << last4.hex.chr('UTF-8')
 
+        else
+          swallow_rest_of_the_string
+          return Token.new(Token::ERROR, "invalid escape \\#{char}")
         end
       end
     end

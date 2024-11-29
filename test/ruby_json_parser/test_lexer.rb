@@ -33,6 +33,102 @@ module RubyJsonParser
         Token.new(Token::RBRACE)
       ]
       assert_equal expected, lex('{ "foo\n": "ba\rr", "elo\uffe9": [-1, 0.25, 5e9, 5e-20, 14e+9, false, true, null] }')
+
+      expected = [
+        Token.new(Token::NUMBER, '123')
+      ]
+      assert_equal expected, lex('123')
+
+      expected = [
+        Token.new(Token::ERROR, 'unterminated string literal')
+      ]
+      assert_equal expected, lex('"foo')
+
+      expected = [
+        Token.new(Token::ERROR, 'invalid escape \g'),
+        Token.new(Token::NUMBER, '123')
+      ]
+      assert_equal expected, lex('"lol\gelo" 123')
+
+      expected = [
+        Token.new(Token::ERROR, 'invalid unicode escape'),
+        Token.new(Token::NUMBER, '123')
+      ]
+      assert_equal expected, lex('"lol\ugego" 123')
+
+      expected = [
+        Token.new(Token::ERROR, 'unexpected identifier: "fdg1234fsdf"'),
+        Token.new(Token::COMMA),
+        Token.new(Token::NUMBER, '123')
+      ]
+      assert_equal expected, lex('fdg1234fsdf, 123')
+
+      expected = [
+        Token.new(Token::ERROR, 'unexpected identifier: "fdg1234fsdf"')
+      ]
+      assert_equal expected, lex('fdg1234fsdf')
+
+      expected = [
+        Token.new(Token::NUMBER, '123'),
+        Token.new(Token::ERROR, 'unexpected identifier: "fge"')
+      ]
+      assert_equal expected, lex('123fge')
+
+      expected = [
+        Token.new(Token::NUMBER, '123.985')
+      ]
+      assert_equal expected, lex('123.985')
+
+      expected = [
+        Token.new(Token::NUMBER, '0')
+      ]
+      assert_equal expected, lex('0')
+
+      expected = [
+        Token.new(Token::ERROR, "unexpected char in number literal: \"5\", expected '.'"),
+        Token.new(Token::STRING, 'lol')
+      ]
+      assert_equal expected, lex('05812 "lol"')
+
+      expected = [
+        Token.new(Token::NUMBER, '0.12')
+      ]
+      assert_equal expected, lex('0.12')
+
+      expected = [
+        Token.new(Token::NUMBER, '5e9')
+      ]
+      assert_equal expected, lex('5e9')
+
+      expected = [
+        Token.new(Token::NUMBER, '5E9')
+      ]
+      assert_equal expected, lex('5E9')
+
+      expected = [
+        Token.new(Token::NUMBER, '5e+9')
+      ]
+      assert_equal expected, lex('5e+9')
+
+      expected = [
+        Token.new(Token::NUMBER, '5e-9')
+      ]
+      assert_equal expected, lex('5e-9')
+
+      expected = [
+        Token.new(Token::NUMBER, '1.5e9')
+      ]
+      assert_equal expected, lex('1.5e9')
+
+      expected = [
+        Token.new(Token::NUMBER, '1.5e+9')
+      ]
+      assert_equal expected, lex('1.5e+9')
+
+      expected = [
+        Token.new(Token::NUMBER, '1.5e-9')
+      ]
+      assert_equal expected, lex('1.5e-9')
     end
 
     private
