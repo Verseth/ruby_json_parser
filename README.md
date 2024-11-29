@@ -42,7 +42,7 @@ There is a simplified API that lets use generate an array of tokens at once.
 ```rb
 require 'ruby_json_parser'
 
-RubyJsonParser::Lexer.lex('{ "some": ["json", 2e-29, "text"] }')
+RubyJsonParser.lex('{ "some": ["json", 2e-29, "text"] }')
 #=> [Token(:lbrace), Token(:string, "some"), Token(:colon), Token(:lbracket), Token(:string, "json"), Token(:comma), Token(:number, "2e-29"), Token(:comma), Token(:string, "text"), Token(:rbracket), Token(:rbrace)]
 ```
 
@@ -104,8 +104,28 @@ puts ast.to_s # JSON-like format
 # {"some": ["json", 2e-29, "text"]}
 
 ast.class #=> RubyJsonParser::AST::ObjectLiteralNode
+
+ast.pairs[0].key #=> RubyJsonParser::AST::StringLiteralNode("some")
+ast.pairs[0].value.elements[2] #=> RubyJsonParser::AST::NumberLiteralNode("2e-29")
 ```
 
+### Evaluator
+
+This library implements a JSON evaluator.
+It interprets JSON source as builtin Ruby data structures.
+
+You can use it by calling `RubyJsonParser.eval` passing in a string
+with JSON source.
+
+It throws `RubyJsonParser::SyntaxError` when the string cannot be parsed.
+
+```rb
+RubyJsonParser.eval('{ "some": ["json", 2e-29, "text"] }')
+# => {"some"=>["json", 2.0e-29, "text"]}
+
+RubyJsonParser.eval('{ "some" }')
+#! RubyJsonParser::SyntaxError: missing key in object literal for value: `"some"`
+```
 
 ## Development
 

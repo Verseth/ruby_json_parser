@@ -13,575 +13,556 @@ class TestRubyJsonParser < Minitest::Test
   end
 
   def test_parse_accept
-    parse_test(
-      '"foo"',
-      AST::StringLiteralNode.new('foo'),
+    result = parse('"foo"')
+    expected_ast = AST::StringLiteralNode.new('foo')
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
+
+    result = parse('[]')
+    expected_ast = AST::ArrayLiteralNode.new([])
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
+
+    result = parse(' [] ')
+    expected_ast = AST::ArrayLiteralNode.new([])
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
+
+    result = parse('[true]')
+    expected_ast = AST::ArrayLiteralNode.new(
+      [AST::TrueLiteralNode.new],
     )
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
 
-    parse_test(
-      '["foo"]',
-      AST::ArrayLiteralNode.new(
-        [AST::StringLiteralNode.new('foo')],
-      ),
+    result = parse("[\"a\"]\n")
+    expected_ast = AST::ArrayLiteralNode.new(
+      [AST::StringLiteralNode.new('a')],
     )
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
+    result = parse('""')
+    expected_ast = AST::StringLiteralNode.new('')
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
 
-    parse_test(
-      '[]',
-      AST::ArrayLiteralNode.new([]),
+    result = parse('true')
+    expected_ast = AST::TrueLiteralNode.new
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
+
+    result = parse('false')
+    expected_ast = AST::FalseLiteralNode.new
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
+
+    result = parse('null')
+    expected_ast = AST::NullLiteralNode.new
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
+
+    result = parse('42')
+    expected_ast = AST::NumberLiteralNode.new('42')
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
+
+    result = parse('-42')
+    expected_ast = AST::NumberLiteralNode.new('-42')
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
+
+    result = parse('0')
+    expected_ast = AST::NumberLiteralNode.new('0')
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
+
+    result = parse('-0')
+    expected_ast = AST::NumberLiteralNode.new('-0')
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
+
+    result = parse('-0.1')
+    expected_ast = AST::NumberLiteralNode.new('-0.1')
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
+
+    result = parse('123.456789')
+    expected_ast = AST::NumberLiteralNode.new('123.456789')
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
+
+    result = parse('0e1')
+    expected_ast = AST::NumberLiteralNode.new('0e1')
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
+
+    result = parse('1e+2')
+    expected_ast = AST::NumberLiteralNode.new('1e+2')
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
+
+    result = parse('1E+2')
+    expected_ast = AST::NumberLiteralNode.new('1E+2')
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
+
+    result = parse('1e-2')
+    expected_ast = AST::NumberLiteralNode.new('1e-2')
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
+
+    result = parse('1E-2')
+    expected_ast = AST::NumberLiteralNode.new('1E-2')
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
+
+    result = parse('123e45')
+    expected_ast = AST::NumberLiteralNode.new('123e45')
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
+
+    result = parse('123E45')
+    expected_ast = AST::NumberLiteralNode.new('123E45')
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
+
+    result = parse('123.456e78')
+    expected_ast = AST::NumberLiteralNode.new('123.456e78')
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
+
+    result = parse('123.456E78')
+    expected_ast = AST::NumberLiteralNode.new('123.456E78')
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
+
+    result = parse('123.456e+78')
+    expected_ast = AST::NumberLiteralNode.new('123.456e+78')
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
+
+    result = parse('123.456E+78')
+    expected_ast = AST::NumberLiteralNode.new('123.456E+78')
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
+
+    result = parse('123.456e-78')
+    expected_ast = AST::NumberLiteralNode.new('123.456e-78')
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
+
+    result = parse('123.456E-78')
+    expected_ast = AST::NumberLiteralNode.new('123.456E-78')
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
+
+    result = parse('[ 4]')
+    expected_ast = AST::ArrayLiteralNode.new(
+      [AST::NumberLiteralNode.new('4')],
     )
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
 
-    parse_test(
-      ' [] ',
-      AST::ArrayLiteralNode.new([]),
+    result = parse(<<~JSON)
+      [
+        6
+      ]
+    JSON
+    expected_ast = AST::ArrayLiteralNode.new(
+      [AST::NumberLiteralNode.new('6')],
     )
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
 
-    parse_test(
-      '[true]',
-      AST::ArrayLiteralNode.new(
-        [AST::TrueLiteralNode.new],
-      ),
+    result = parse('[1,null,null,null,2]')
+    expected_ast = AST::ArrayLiteralNode.new(
+      [
+        AST::NumberLiteralNode.new('1'),
+        AST::NullLiteralNode.new,
+        AST::NullLiteralNode.new,
+        AST::NullLiteralNode.new,
+        AST::NumberLiteralNode.new('2'),
+      ],
     )
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
 
-    parse_test(
-      "[\"a\"]\n",
-      AST::ArrayLiteralNode.new(
-        [AST::StringLiteralNode.new('a')],
-      ),
+    result = parse('["aa"]')
+    expected_ast = AST::ArrayLiteralNode.new(
+      [AST::StringLiteralNode.new("a\x7Fa")],
     )
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
 
-    parse_test(
-      '""',
-      AST::StringLiteralNode.new(''),
+    result = parse('["€𝄞"]')
+    expected_ast = AST::ArrayLiteralNode.new(
+      [AST::StringLiteralNode.new('€𝄞')],
     )
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
 
-    parse_test(
-      'true',
-      AST::TrueLiteralNode.new,
+    result = parse('["\u0022"]')
+    expected_ast = AST::ArrayLiteralNode.new(
+      [AST::StringLiteralNode.new("\u0022")],
     )
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
 
-    parse_test(
-      'false',
-      AST::FalseLiteralNode.new,
+    result = parse('["\uFFFE"]')
+    expected_ast = AST::ArrayLiteralNode.new(
+      [AST::StringLiteralNode.new("\uFFFE")],
     )
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
 
-    parse_test(
-      'null',
-      AST::NullLiteralNode.new,
+    result = parse('["\uFDD0"]')
+    expected_ast = AST::ArrayLiteralNode.new(
+      [AST::StringLiteralNode.new("\uFDD0")],
     )
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
 
-    parse_test(
-      '42',
-      AST::NumberLiteralNode.new('42'),
+    result = parse('["\u2064"]')
+    expected_ast = AST::ArrayLiteralNode.new(
+      [AST::StringLiteralNode.new("\u2064")],
     )
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
 
-    parse_test(
-      '-42',
-      AST::NumberLiteralNode.new('-42'),
+    result = parse('["\u200B"]')
+    expected_ast = AST::ArrayLiteralNode.new(
+      [AST::StringLiteralNode.new("\u200B")],
     )
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
 
-    parse_test(
-      '0',
-      AST::NumberLiteralNode.new('0'),
+    result = parse('["\uD83F\uDFFE"]')
+    expected_ast = AST::ArrayLiteralNode.new(
+      [AST::StringLiteralNode.new("\xED\xA0\xBF\xED\xBF\xBE")],
     )
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
 
-    parse_test(
-      '-0',
-      AST::NumberLiteralNode.new('-0'),
+    result = parse('["\uD83F\uDFFE"]')
+    expected_ast = AST::ArrayLiteralNode.new(
+      [AST::StringLiteralNode.new("\xED\xA0\xBF\xED\xBF\xBE")],
     )
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
 
-    parse_test(
-      '-0.1',
-      AST::NumberLiteralNode.new('-0.1'),
+    result = parse('["\uDBFF\uDFFE"]')
+    expected_ast = AST::ArrayLiteralNode.new(
+      [AST::StringLiteralNode.new("\xED\xAF\xBF\xED\xBF\xBE")],
     )
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
 
-    parse_test(
-      '123.456789',
-      AST::NumberLiteralNode.new('123.456789'),
+    result = parse('["⍂㈴⍂"]')
+    expected_ast = AST::ArrayLiteralNode.new(
+      [AST::StringLiteralNode.new('⍂㈴⍂')],
     )
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
 
-    parse_test(
-      '0e1',
-      AST::NumberLiteralNode.new('0e1'),
+    result = parse('["\u005C"]')
+    expected_ast = AST::ArrayLiteralNode.new(
+      [AST::StringLiteralNode.new("\u005C")],
     )
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
 
-    parse_test(
-      '1e+2',
-      AST::NumberLiteralNode.new('1e+2'),
+    result = parse('[""]')
+    expected_ast = AST::ArrayLiteralNode.new(
+      [AST::StringLiteralNode.new("\x7F")],
     )
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
 
-    parse_test(
-      '1E+2',
-      AST::NumberLiteralNode.new('1E+2'),
+    result = parse('["new\u000Aline"]')
+    expected_ast = AST::ArrayLiteralNode.new(
+      [AST::StringLiteralNode.new("new\nline")],
     )
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
 
-    parse_test(
-      '1e-2',
-      AST::NumberLiteralNode.new('1e-2'),
+    result = parse('["\u0061\u30af\u30EA\u30b9"]')
+    expected_ast = AST::ArrayLiteralNode.new(
+      [AST::StringLiteralNode.new("\u0061\u30af\u30EA\u30b9")],
     )
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
 
-    parse_test(
-      '1E-2',
-      AST::NumberLiteralNode.new('1E-2'),
+    result = parse('[" "]')
+    expected_ast = AST::ArrayLiteralNode.new(
+      [AST::StringLiteralNode.new(' ')],
     )
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
 
-    parse_test(
-      '123e45',
-      AST::NumberLiteralNode.new('123e45'),
+    result = parse('[" "]')
+    expected_ast = AST::ArrayLiteralNode.new(
+      [AST::StringLiteralNode.new(' ')],
     )
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
 
-    parse_test(
-      '123E45',
-      AST::NumberLiteralNode.new('123E45'),
+    result = parse('["\u002c"]')
+    expected_ast = AST::ArrayLiteralNode.new(
+      [AST::StringLiteralNode.new("\u002c")],
     )
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
 
-    parse_test(
-      '123.456e78',
-      AST::NumberLiteralNode.new('123.456e78'),
+    result = parse('["\u0123"]')
+    expected_ast = AST::ArrayLiteralNode.new(
+      [AST::StringLiteralNode.new("\u0123")],
     )
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
 
-    parse_test(
-      '123.456E78',
-      AST::NumberLiteralNode.new('123.456E78'),
+    result = parse('["\u0821"]')
+    expected_ast = AST::ArrayLiteralNode.new(
+      [AST::StringLiteralNode.new("\u0821")],
     )
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
 
-    parse_test(
-      '123.456e+78',
-      AST::NumberLiteralNode.new('123.456e+78'),
+    result = parse('["𛿿"]')
+    expected_ast = AST::ArrayLiteralNode.new(
+      [AST::StringLiteralNode.new('𛿿')],
     )
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
 
-    parse_test(
-      '123.456E+78',
-      AST::NumberLiteralNode.new('123.456E+78'),
+    result = parse('" "')
+    expected_ast = AST::StringLiteralNode.new(' ')
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
+
+    result = parse('"\""')
+    expected_ast = AST::StringLiteralNode.new('"')
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
+
+    result = parse('"\r\b\n\t\f\"\\\\\\/"')
+    expected_ast = AST::StringLiteralNode.new("\r\b\n\t\f\"\\/")
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
+
+    result = parse(<<~JSON)
+      {
+        "a": "b"
+      }
+    JSON
+    expected_ast = AST::ObjectLiteralNode.new(
+      [
+        AST::KeyValuePairNode.new(
+          AST::StringLiteralNode.new('a'),
+          AST::StringLiteralNode.new('b'),
+        ),
+      ],
     )
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
 
-    parse_test(
-      '123.456e-78',
-      AST::NumberLiteralNode.new('123.456e-78'),
+    result = parse('{"a":[]}')
+    expected_ast = AST::ObjectLiteralNode.new(
+      [
+        AST::KeyValuePairNode.new(
+          AST::StringLiteralNode.new('a'),
+          AST::ArrayLiteralNode.new([]),
+        ),
+      ],
     )
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
 
-    parse_test(
-      '123.456E-78',
-      AST::NumberLiteralNode.new('123.456E-78'),
+    result = parse <<~JSON
+      {
+        "x": [
+          {
+            "id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+          }
+        ],
+        "id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      }
+    JSON
+    expected_ast = AST::ObjectLiteralNode.new(
+      [
+        AST::KeyValuePairNode.new(
+          AST::StringLiteralNode.new('x'),
+          AST::ArrayLiteralNode.new(
+            [
+              AST::ObjectLiteralNode.new(
+                [
+                  AST::KeyValuePairNode.new(
+                    AST::StringLiteralNode.new('id'),
+                    AST::StringLiteralNode.new('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        AST::KeyValuePairNode.new(
+          AST::StringLiteralNode.new('id'),
+          AST::StringLiteralNode.new('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'),
+        ),
+      ],
     )
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
 
-    parse_test(
-      '[ 4]',
-      AST::ArrayLiteralNode.new(
-        [AST::NumberLiteralNode.new('4')],
-      ),
+    result = parse('{ "min": -1.0e+28, "max": 1.0e+28 }')
+    expected_ast = AST::ObjectLiteralNode.new(
+      [
+        AST::KeyValuePairNode.new(
+          AST::StringLiteralNode.new('min'),
+          AST::NumberLiteralNode.new('-1.0e+28'),
+        ),
+        AST::KeyValuePairNode.new(
+          AST::StringLiteralNode.new('max'),
+          AST::NumberLiteralNode.new('1.0e+28'),
+        ),
+      ],
     )
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
 
-    parse_test(
-      <<~JSON,
-        [
-          6
-        ]
-
-      JSON
-      AST::ArrayLiteralNode.new(
-        [AST::NumberLiteralNode.new('6')],
-      ),
+    result = parse('{"foo\u0000bar": 42}')
+    expected_ast = AST::ObjectLiteralNode.new(
+      [
+        AST::KeyValuePairNode.new(
+          AST::StringLiteralNode.new("foo\u0000bar"),
+          AST::NumberLiteralNode.new('42'),
+        ),
+      ],
     )
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
 
-    parse_test(
-      '[1,null,null,null,2]',
-      AST::ArrayLiteralNode.new(
-        [
-          AST::NumberLiteralNode.new('1'),
+    result = parse('{"":0}')
+    expected_ast = AST::ObjectLiteralNode.new(
+      [
+        AST::KeyValuePairNode.new(
+          AST::StringLiteralNode.new(''),
+          AST::NumberLiteralNode.new('0'),
+        ),
+      ],
+    )
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
+
+    result = parse('{"foo": 42, "foo": null}')
+    expected_ast = AST::ObjectLiteralNode.new(
+      [
+        AST::KeyValuePairNode.new(
+          AST::StringLiteralNode.new('foo'),
+          AST::NumberLiteralNode.new('42'),
+        ),
+        AST::KeyValuePairNode.new(
+          AST::StringLiteralNode.new('foo'),
           AST::NullLiteralNode.new,
-          AST::NullLiteralNode.new,
-          AST::NullLiteralNode.new,
-          AST::NumberLiteralNode.new('2'),
-        ],
-      ),
+        ),
+      ],
     )
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
 
-    parse_test(
-      '["aa"]',
-      AST::ArrayLiteralNode.new(
-        [AST::StringLiteralNode.new("a\x7Fa")],
-      ),
-    )
-
-    parse_test(
-      '["€𝄞"]',
-      AST::ArrayLiteralNode.new(
-        [AST::StringLiteralNode.new('€𝄞')],
-      ),
-    )
-
-    parse_test(
-      '["\u0022"]',
-      AST::ArrayLiteralNode.new(
-        [AST::StringLiteralNode.new("\u0022")],
-      ),
-    )
-
-    parse_test(
-      '["\uFFFE"]',
-      AST::ArrayLiteralNode.new(
-        [AST::StringLiteralNode.new("\uFFFE")],
-      ),
-    )
-
-    parse_test(
-      '["\uFDD0"]',
-      AST::ArrayLiteralNode.new(
-        [AST::StringLiteralNode.new("\uFDD0")],
-      ),
-    )
-
-    parse_test(
-      '["\u2064"]',
-      AST::ArrayLiteralNode.new(
-        [AST::StringLiteralNode.new("\u2064")],
-      ),
-    )
-
-    parse_test(
-      '["\u200B"]',
-      AST::ArrayLiteralNode.new(
-        [AST::StringLiteralNode.new("\u200B")],
-      ),
-    )
-
-    parse_test(
-      '["\uD83F\uDFFE"]',
-      AST::ArrayLiteralNode.new(
-        [AST::StringLiteralNode.new("\xED\xA0\xBF\xED\xBF\xBE")],
-      ),
-    )
-
-    parse_test(
-      '["\uD83F\uDFFE"]',
-      AST::ArrayLiteralNode.new(
-        [AST::StringLiteralNode.new("\xED\xA0\xBF\xED\xBF\xBE")],
-      ),
-    )
-
-    parse_test(
-      '["\uDBFF\uDFFE"]',
-      AST::ArrayLiteralNode.new(
-        [AST::StringLiteralNode.new("\xED\xAF\xBF\xED\xBF\xBE")],
-      ),
-    )
-
-    parse_test(
-      '["⍂㈴⍂"]',
-      AST::ArrayLiteralNode.new(
-        [AST::StringLiteralNode.new('⍂㈴⍂')],
-      ),
-    )
-
-    parse_test(
-      '["\u005C"]',
-      AST::ArrayLiteralNode.new(
-        [AST::StringLiteralNode.new("\u005C")],
-      ),
-    )
-
-    parse_test(
-      '[""]',
-      AST::ArrayLiteralNode.new(
-        [AST::StringLiteralNode.new("\x7F")],
-      ),
-    )
-
-    parse_test(
-      '["new\u000Aline"]',
-      AST::ArrayLiteralNode.new(
-        [AST::StringLiteralNode.new("new\nline")],
-      ),
-    )
-
-    parse_test(
-      '["\u0061\u30af\u30EA\u30b9"]',
-      AST::ArrayLiteralNode.new(
-        [AST::StringLiteralNode.new("\u0061\u30af\u30EA\u30b9")],
-      ),
-    )
-
-    parse_test(
-      '[" "]',
-      AST::ArrayLiteralNode.new(
-        [AST::StringLiteralNode.new(' ')],
-      ),
-    )
-
-    parse_test(
-      '[" "]',
-      AST::ArrayLiteralNode.new(
-        [AST::StringLiteralNode.new(' ')],
-      ),
-    )
-
-    parse_test(
-      '["\u002c"]',
-      AST::ArrayLiteralNode.new(
-        [AST::StringLiteralNode.new("\u002c")],
-      ),
-    )
-
-    parse_test(
-      '["\u0123"]',
-      AST::ArrayLiteralNode.new(
-        [AST::StringLiteralNode.new("\u0123")],
-      ),
-    )
-
-    parse_test(
-      '["\u0821"]',
-      AST::ArrayLiteralNode.new(
-        [AST::StringLiteralNode.new("\u0821")],
-      ),
-    )
-
-    parse_test(
-      '["𛿿"]',
-      AST::ArrayLiteralNode.new(
-        [AST::StringLiteralNode.new('𛿿')],
-      ),
-    )
-
-    parse_test(
-      '" "',
-      AST::StringLiteralNode.new(' '),
-    )
-
-    parse_test(
-      '"\""',
-      AST::StringLiteralNode.new('"'),
-    )
-
-    parse_test(
-      '"\r\b\n\t\f\"\\\\\\/"',
-      AST::StringLiteralNode.new("\r\b\n\t\f\"\\/"),
-    )
-
-    parse_test(
-      <<~JSON,
-        {
-          "a": "b"
-        }
-      JSON
-      AST::ObjectLiteralNode.new(
-        [
-          AST::KeyValuePairNode.new(
-            AST::StringLiteralNode.new('a'),
-            AST::StringLiteralNode.new('b'),
-          ),
-        ],
-      ),
-    )
-
-    parse_test(
-      '{"a":[]}',
-      AST::ObjectLiteralNode.new(
-        [
-          AST::KeyValuePairNode.new(
-            AST::StringLiteralNode.new('a'),
-            AST::ArrayLiteralNode.new([]),
-          ),
-        ],
-      ),
-    )
-
-    parse_test(
-      '{"x":[{"id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"}], "id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"}',
-      AST::ObjectLiteralNode.new(
-        [
-          AST::KeyValuePairNode.new(
-            AST::StringLiteralNode.new('x'),
-            AST::ArrayLiteralNode.new(
-              [
-                AST::ObjectLiteralNode.new(
-                  [
-                    AST::KeyValuePairNode.new(
-                      AST::StringLiteralNode.new('id'),
-                      AST::StringLiteralNode.new('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          AST::KeyValuePairNode.new(
-            AST::StringLiteralNode.new('id'),
-            AST::StringLiteralNode.new('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'),
-          ),
-        ],
-      ),
-    )
-
-    parse_test(
-      '{ "min": -1.0e+28, "max": 1.0e+28 }',
-      AST::ObjectLiteralNode.new(
-        [
-          AST::KeyValuePairNode.new(
-            AST::StringLiteralNode.new('min'),
-            AST::NumberLiteralNode.new('-1.0e+28'),
-          ),
-          AST::KeyValuePairNode.new(
-            AST::StringLiteralNode.new('max'),
-            AST::NumberLiteralNode.new('1.0e+28'),
-          ),
-        ],
-      ),
-    )
-
-    parse_test(
-      '{"foo\u0000bar": 42}',
-      AST::ObjectLiteralNode.new(
-        [
-          AST::KeyValuePairNode.new(
-            AST::StringLiteralNode.new("foo\u0000bar"),
-            AST::NumberLiteralNode.new('42'),
-          ),
-        ],
-      ),
-    )
-
-    parse_test(
-      '{"":0}',
-      AST::ObjectLiteralNode.new(
-        [
-          AST::KeyValuePairNode.new(
-            AST::StringLiteralNode.new(''),
-            AST::NumberLiteralNode.new('0'),
-          ),
-        ],
-      ),
-    )
-
-    parse_test(
-      '{"foo": 42, "foo": null}',
-      AST::ObjectLiteralNode.new(
-        [
-          AST::KeyValuePairNode.new(
-            AST::StringLiteralNode.new('foo'),
-            AST::NumberLiteralNode.new('42'),
-          ),
-          AST::KeyValuePairNode.new(
-            AST::StringLiteralNode.new('foo'),
-            AST::NullLiteralNode.new,
-          ),
-        ],
-      ),
-    )
-
-    parse_test(
-      '{}',
-      AST::ObjectLiteralNode.new([]),
-    )
+    result = parse('{}')
+    expected_ast = AST::ObjectLiteralNode.new([])
+    assert_equal expected_ast, result.ast
+    assert_equal [], result.errors
   end
 
   def test_parse_reject
-    parse_test(
-      '.12',
-      AST::InvalidNode.new(Token.new(Token::DOT)),
-      ['unexpected token `.`'],
-    )
+    result = parse('.12')
+    expected_ast = AST::InvalidNode.new(Token.new(Token::DOT))
+    assert_equal expected_ast, result.ast
+    assert_equal ['unexpected token `.`'], result.errors
 
-    parse_test(
-      '1.',
-      AST::InvalidNode.new(Token.new(Token::ERROR, 'unexpected EOF')),
-      ['unexpected EOF'],
-    )
+    result = parse('1.')
+    expected_ast = AST::InvalidNode.new(Token.new(Token::ERROR, 'unexpected EOF'))
+    assert_equal expected_ast, result.ast
+    assert_equal ['unexpected EOF'], result.errors
 
-    parse_test(
-      '012',
-      AST::InvalidNode.new(Token.new(Token::ERROR, 'illegal trailing zero in number literal')),
-      ['illegal trailing zero in number literal'],
-    )
+    result = parse('012')
+    expected_ast = AST::InvalidNode.new(Token.new(Token::ERROR, 'illegal trailing zero in number literal'))
+    assert_equal expected_ast, result.ast
+    assert_equal ['illegal trailing zero in number literal'], result.errors
 
-    parse_test(
-      '- 1',
-      AST::InvalidNode.new(Token.new(Token::ERROR, 'unexpected number char: ` `')),
-      ['unexpected number char: ` `'],
-    )
+    result = parse('- 1')
+    expected_ast = AST::InvalidNode.new(Token.new(Token::ERROR, 'unexpected number char: ` `'))
+    assert_equal expected_ast, result.ast
+    assert_equal ['unexpected number char: ` `'], result.errors
 
-    parse_test(
-      '+1',
-      AST::InvalidNode.new(Token.new(Token::ERROR, 'unexpected char `+`')),
-      ['unexpected char `+`'],
-    )
+    result = parse('+1')
+    expected_ast = AST::InvalidNode.new(Token.new(Token::ERROR, 'unexpected char `+`'))
+    assert_equal expected_ast, result.ast
+    assert_equal ['unexpected char `+`'], result.errors
 
-    parse_test(
-      '[1, 2,]',
-      AST::ArrayLiteralNode.new(
-        [
+    result = parse('[1, 2,]')
+    expected_ast = AST::ArrayLiteralNode.new(
+      [
+        AST::NumberLiteralNode.new('1'),
+        AST::NumberLiteralNode.new('2'),
+      ],
+    )
+    assert_equal expected_ast, result.ast
+    assert_equal ['illegal trailing comma in array literal'], result.errors
+
+    result = parse('[1, 2')
+    expected_ast = AST::ArrayLiteralNode.new(
+      [
+        AST::NumberLiteralNode.new('1'),
+        AST::NumberLiteralNode.new('2'),
+      ],
+    )
+    assert_equal expected_ast, result.ast
+    assert_equal ['unexpected `END_OF_FILE`, expected `]`'], result.errors
+
+    result = parse('{ "foo": 1, 2 }')
+    expected_ast = AST::ObjectLiteralNode.new(
+      [
+        AST::KeyValuePairNode.new(
+          AST::StringLiteralNode.new('foo'),
           AST::NumberLiteralNode.new('1'),
+        ),
+        AST::KeyValuePairNode.new(
+          nil,
           AST::NumberLiteralNode.new('2'),
-        ],
-      ),
-      ['illegal trailing comma in array literal'],
+        ),
+      ],
     )
+    assert_equal expected_ast, result.ast
+    assert_equal ['missing key in object literal for value: `2`'], result.errors
 
-    parse_test(
-      '[1, 2',
-      AST::ArrayLiteralNode.new(
-        [
+    result = parse('{ "foo": 1, }')
+    expected_ast = AST::ObjectLiteralNode.new(
+      [
+        AST::KeyValuePairNode.new(
+          AST::StringLiteralNode.new('foo'),
           AST::NumberLiteralNode.new('1'),
-          AST::NumberLiteralNode.new('2'),
-        ],
-      ),
-      ['unexpected `END_OF_FILE`, expected `]`'],
+        ),
+      ],
     )
+    assert_equal expected_ast, result.ast
+    assert_equal ['illegal trailing comma in object literal'], result.errors
 
-    parse_test(
-      '{ "foo": 1, 2 }',
-      AST::ObjectLiteralNode.new(
-        [
-          AST::KeyValuePairNode.new(
-            AST::StringLiteralNode.new('foo'),
-            AST::NumberLiteralNode.new('1'),
-          ),
-          AST::KeyValuePairNode.new(
-            nil,
-            AST::NumberLiteralNode.new('2'),
-          ),
-        ],
-      ),
-      ['missing key in object literal for value: `2`'],
+    result = parse('{ "foo": 1')
+    expected_ast = AST::ObjectLiteralNode.new(
+      [
+        AST::KeyValuePairNode.new(
+          AST::StringLiteralNode.new('foo'),
+          AST::NumberLiteralNode.new('1'),
+        ),
+      ],
     )
-
-    parse_test(
-      '{ "foo": 1, }',
-      AST::ObjectLiteralNode.new(
-        [
-          AST::KeyValuePairNode.new(
-            AST::StringLiteralNode.new('foo'),
-            AST::NumberLiteralNode.new('1'),
-          ),
-        ],
-      ),
-      ['illegal trailing comma in object literal'],
-    )
-
-    parse_test(
-      '{ "foo": 1',
-      AST::ObjectLiteralNode.new(
-        [
-          AST::KeyValuePairNode.new(
-            AST::StringLiteralNode.new('foo'),
-            AST::NumberLiteralNode.new('1'),
-          ),
-        ],
-      ),
-      ['unexpected `END_OF_FILE`, expected `}`'],
-    )
+    assert_equal expected_ast, result.ast
+    assert_equal ['unexpected `END_OF_FILE`, expected `}`'], result.errors
   end
 
   private
-
-  sig do
-    params(input: String, ast: AST::Node, errors: T::Array[String]).void
-  end
-  def parse_test(input, ast, errors = [])
-    result = parse(input)
-    assert_equal ast, result.ast
-    assert_equal errors, result.errors
-  end
 
   sig { params(source: String).returns(RubyJsonParser::Result) }
   def parse(source)

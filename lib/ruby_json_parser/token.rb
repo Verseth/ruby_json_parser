@@ -1,6 +1,8 @@
 # typed: strong
 # frozen_string_literal: true
 
+require 'set'
+
 class RubyJsonParser
   # Represents a single token (word) produced by the lexer.
   class Token
@@ -9,6 +11,7 @@ class RubyJsonParser
     class << self
       extend T::Sig
 
+      # Converts a token type into a human-readable string.
       sig { params(type: Symbol).returns(String) }
       def type_to_string(type)
         case type
@@ -74,6 +77,7 @@ class RubyJsonParser
       "Token(#{type.inspect}, #{value.inspect})"
     end
 
+    # Converts a token into a human-readable string.
     sig { returns(String) }
     def to_s
       case type
@@ -112,6 +116,25 @@ class RubyJsonParser
       end
     end
 
+    # String containing all valid decimal digits
+    DIGITS = '0123456789'
+    # String containing all valid hexadecimal digits
+    HEX_DIGITS = '0123456789abcdefABCDEF'
+
+    # Set of all JSON keywords
+    KEYWORDS = T.let(
+      Set[
+        'false',
+        'true',
+        'null',
+      ],
+      T::Set[String],
+    )
+
+
+    # List of all token types
+    # ------------------------
+
     # Represents no token, a placeholder
     NONE = :none
     # Signifies that the entire string/file has been processed,
@@ -144,20 +167,5 @@ class RubyJsonParser
     TRUE = :true
     # Null literal `null`
     NULL = :null
-
-    # String containing all valid decimal digits
-    DIGITS = '0123456789'
-    # String containing all valid hexadecimal digits
-    HEX_DIGITS = '0123456789abcdefABCDEF'
-
-    # Set of all JSON keywords
-    KEYWORDS = T.let(
-      Set[
-        false.to_s,
-        true.to_s,
-        NULL.to_s,
-      ],
-      T::Set[String],
-    )
   end
 end

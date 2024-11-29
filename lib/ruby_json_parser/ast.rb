@@ -5,6 +5,8 @@ class RubyJsonParser
   # Contains the definitions of all AST (Abstract Syntax Tree) nodes.
   # AST is the data structure that is returned by the parser.
   module AST
+    # A string that represents a single level of indentation
+    # in S-expressions
     INDENT_UNIT = '  '
 
     # Abstract class representing an AST node.

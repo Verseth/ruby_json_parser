@@ -4,7 +4,7 @@
 require 'test_helper'
 
 class RubyJsonParser
-  class TestLexer < Minitest::Test
+  class LexerTest < Minitest::Test
     def test_lex
       expected = [
         Token.new(Token::LBRACE),

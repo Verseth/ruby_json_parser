@@ -2,7 +2,8 @@
 # frozen_string_literal: true
 
 class RubyJsonParser
-  # The result of parsing a JSON string/file
+  # The result of parsing a JSON string/file.
+  # Combines an AST (Abstract Syntax Tree) and a list of errors.
   class Result
     extend T::Sig
 
