@@ -38,7 +38,7 @@ lexer.next #=> Token(:string, "json")
 lexer.next #=> Token(:end_of_file)
 ```
 
-There is a simplified API that lets use generate an array of tokens at once.
+There is a simplified API that lets you generate an array of all tokens.
 
 ```rb
 require 'ruby_json_parser'
@@ -113,7 +113,7 @@ ast.pairs[0].value.elements[2] #=> RubyJsonParser::AST::NumberLiteralNode("2e-29
 ### Evaluator
 
 This library implements a JSON evaluator.
-It interprets JSON source as builtin Ruby data structures.
+It interprets a JSON source string as builtin Ruby data structures.
 
 You can use it by calling `RubyJsonParser.eval` passing in a string
 with JSON source.
@@ -122,7 +122,7 @@ It throws `RubyJsonParser::SyntaxError` when the string cannot be parsed.
 
 ```rb
 RubyJsonParser.eval('{ "some": ["json", 2e-29, "text"] }')
-# => {"some"=>["json", 2.0e-29, "text"]}
+#=> {"some"=>["json", 2.0e-29, "text"]}
 
 RubyJsonParser.eval('{ "some" }')
 #! RubyJsonParser::SyntaxError: missing key in object literal for value: `"some"`
