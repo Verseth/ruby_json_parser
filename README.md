@@ -31,8 +31,9 @@ require 'ruby_json_parser'
 lexer = RubyJsonParser::Lexer.new('{ "some": ["json", 2e-29, "text"] }')
 lexer.next #=> Token(:lbrace)
 lexer.next #=> Token(:string, "some")
-lexer.next #=> Token(:string, "some")
 lexer.next #=> Token(:colon)
+lexer.next #=> Token(:lbracket)
+lexer.next #=> Token(:string, "json")
 # ...
 lexer.next #=> Token(:end_of_file)
 ```
