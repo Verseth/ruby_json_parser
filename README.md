@@ -1,24 +1,111 @@
 # RubyJsonParser
 
-TODO: Delete this and the text below, and describe your gem
+This library implements a JSON lexer and parser in pure Ruby 💎.
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/ruby_json_parser`. To experiment with that code, run `bin/console` for an interactive prompt.
+It has been built for educational purposes, to serve as a simple example of what makes parsers tick.
 
 ## Installation
 
-TODO: Replace `UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG` with your gem name right after releasing it to RubyGems.org. Please do not do it earlier due to security reasons. Alternatively, replace this section with instructions to install your gem from git if you don't plan to release to RubyGems.org.
-
 Install the gem and add to the application's Gemfile by executing:
 
-    $ bundle add UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG
+    $ bundle add ruby_json_parser
 
 If bundler is not being used to manage dependencies, install the gem by executing:
 
-    $ gem install UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG
+    $ gem install ruby_json_parser
 
 ## Usage
 
-TODO: Write usage instructions here
+### Lexer
+
+This library implements a streaming JSON lexer.
+You can use it by creating an instance of `RubyJsonParser::Lexer` passing in a string
+with JSON source.
+
+You can call the `next` method to receive the next token.
+Once the lexing is complete a token of type `:end_of_file` gets returned.
+
+```rb
+require 'ruby_json_parser'
+
+lexer = RubyJsonParser::Lexer.new('{ "some": ["json", 2e-29, "text"] }')
+lexer.next #=> Token(:lbrace)
+lexer.next #=> Token(:string, "some")
+lexer.next #=> Token(:string, "some")
+lexer.next #=> Token(:colon)
+# ...
+lexer.next #=> Token(:end_of_file)
+```
+
+There is a simplified API that lets use generate an array of tokens at once.
+
+```rb
+require 'ruby_json_parser'
+
+RubyJsonParser::Lexer.lex('{ "some": ["json", 2e-29, "text"] }')
+#=> [Token(:lbrace), Token(:string, "some"), Token(:colon), Token(:lbracket), Token(:string, "json"), Token(:comma), Token(:number, "2e-29"), Token(:comma), Token(:string, "text"), Token(:rbracket), Token(:rbrace)]
+```
+
+### Parser
+
+This library implements a JSON parser.
+You can use it by calling `RubyJsonParser.parse` passing in a string
+with JSON source.
+
+It returns `RubyJsonParser::Result` which contains the produced AST (Abstract Syntax Tree) and the list of encountered errors.
+
+```rb
+require 'ruby_json_parser'
+
+RubyJsonParser.parse('{ "some": ["json", 2e-29, "text"] }')
+#=> <RubyJsonParser::Result>
+#  AST:
+#    (object
+#      (pair
+#        "some"
+#        (array
+#          "json"
+#          2e-29
+#          "text")))
+
+result = RubyJsonParser.parse('[1, 2')
+#=> <RubyJsonParser::Result>
+#  !Errors!
+#    - unexpected `END_OF_FILE`, expected `]`
+#
+#  AST:
+#    (array
+#      1
+#      2)
+
+result.ast # get the AST
+result.err? # check if there are any errors
+result.errors # get the list of errors
+```
+
+All AST nodes are implemented as classes under the `RubyJsonParser::AST` module.
+AST nodes have an `inspect` method that presents their structure in the [S-expression](https://en.wikipedia.org/wiki/S-expression) format.
+You can also use `#to_s` to convert them to a JSON-like human readable format.
+
+```rb
+result = RubyJsonParser.parse('{"some"   :[   "json",2e-29 ,  "text"  ]}')
+ast = result.ast
+
+puts ast.inspect # S-expression format
+# (object
+#   (pair
+#     "some"
+#     (array
+#       "json"
+#       2e-29
+#       "text")))
+
+puts ast.to_s # JSON-like format
+# {"some": ["json", 2e-29, "text"]}
+
+ast.class #=> RubyJsonParser::AST::ObjectLiteralNode
+```
+
 
 ## Development
 
@@ -28,7 +115,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/ruby_json_parser.
+Bug reports and pull requests are welcome on GitHub at https://github.com/Verseth/ruby_json_parser.
 
 ## License
 
