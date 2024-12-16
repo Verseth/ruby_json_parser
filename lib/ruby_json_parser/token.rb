@@ -57,9 +57,13 @@ module RubyJsonParser
     sig { returns(T.nilable(String)) }
     attr_reader :value
 
-    sig { params(type: Symbol, value: T.nilable(String)).void }
-    def initialize(type, value = nil)
+    sig { returns(Span) }
+    attr_reader :span
+
+    sig { params(type: Symbol, span: Span, value: T.nilable(String)).void }
+    def initialize(type, span, value = nil)
       @type = type
+      @span = span
       @value = value
     end
 
@@ -67,14 +71,14 @@ module RubyJsonParser
     def ==(other)
       return false unless other.is_a?(Token)
 
-      type == other.type && value == other.value
+      type == other.type && value == other.value && span == other.span
     end
 
     sig { returns(String) }
     def inspect
-      return "Token(#{type.inspect})" if value.nil?
+      return "Token(#{type.inspect}, #{span.inspect})" if value.nil?
 
-      "Token(#{type.inspect}, #{value.inspect})"
+      "Token(#{type.inspect}, #{span.inspect}, #{value.inspect})"
     end
 
     # Converts a token into a human-readable string.

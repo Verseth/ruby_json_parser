@@ -4,8 +4,12 @@
 require 'sorbet-runtime'
 
 require_relative 'ruby_json_parser/version'
+require_relative 'ruby_json_parser/position'
+require_relative 'ruby_json_parser/span'
 require_relative 'ruby_json_parser/token'
 require_relative 'ruby_json_parser/lexer'
+require_relative 'ruby_json_parser/ansi_codes'
+require_relative 'ruby_json_parser/highlighter'
 require_relative 'ruby_json_parser/ast'
 require_relative 'ruby_json_parser/result'
 require_relative 'ruby_json_parser/parser'
@@ -70,6 +74,17 @@ module RubyJsonParser
     end
     def eval(source)
       Evaluator.eval(source)
+    end
+
+    # Tokenizes the given source string and creates a new
+    # colorized string using ANSI escape codes.
+    sig do
+      params(
+        source: String,
+      ).returns(String)
+    end
+    def highlight(source)
+      Highlighter.highlight(source)
     end
   end
 

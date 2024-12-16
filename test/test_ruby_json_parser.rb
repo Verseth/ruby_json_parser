@@ -3,7 +3,7 @@
 
 require 'test_helper'
 
-class TestRubyJsonParser < Minitest::Test
+class TestRubyJsonParser < TestCase
   extend T::Sig
   AST = RubyJsonParser::AST
   Token = RubyJsonParser::Token
@@ -477,27 +477,28 @@ class TestRubyJsonParser < Minitest::Test
 
   def test_parse_reject
     result = parse('.12')
-    expected_ast = AST::InvalidNode.new(Token.new(Token::DOT))
+    expected_ast = AST::InvalidNode.new(Token.new(Token::DOT, S(P(0), P(0))))
     assert_equal expected_ast, result.ast
     assert_equal ['unexpected token `.`'], result.errors
 
     result = parse('1.')
-    expected_ast = AST::InvalidNode.new(Token.new(Token::ERROR, 'unexpected EOF'))
+    expected_ast = AST::InvalidNode.new(Token.new(Token::ERROR, S(P(0), P(1)), 'unexpected EOF'))
     assert_equal expected_ast, result.ast
     assert_equal ['unexpected EOF'], result.errors
 
     result = parse('012')
-    expected_ast = AST::InvalidNode.new(Token.new(Token::ERROR, 'illegal trailing zero in number literal'))
+    expected_ast = AST::InvalidNode.new(Token.new(Token::ERROR, S(P(0), P(2)),
+                                                  'illegal trailing zero in number literal',))
     assert_equal expected_ast, result.ast
     assert_equal ['illegal trailing zero in number literal'], result.errors
 
     result = parse('- 1')
-    expected_ast = AST::InvalidNode.new(Token.new(Token::ERROR, 'unexpected number char: ` `'))
+    expected_ast = AST::InvalidNode.new(Token.new(Token::ERROR, S(P(0), P(0)), 'unexpected number char: ` `'))
     assert_equal expected_ast, result.ast
     assert_equal ['unexpected number char: ` `'], result.errors
 
     result = parse('+1')
-    expected_ast = AST::InvalidNode.new(Token.new(Token::ERROR, 'unexpected char `+`'))
+    expected_ast = AST::InvalidNode.new(Token.new(Token::ERROR, S(P(0), P(0)), 'unexpected char `+`'))
     assert_equal expected_ast, result.ast
     assert_equal ['unexpected char `+`'], result.errors
 

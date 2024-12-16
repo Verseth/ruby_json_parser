@@ -49,7 +49,7 @@ module RubyJsonParser
 
       sig { override.params(indent: Integer).returns(String) }
       def inspect(indent = 0)
-        "#{INDENT_UNIT * indent}(invalid `#{token}`)"
+        "#{INDENT_UNIT * indent}(invalid #{token.inspect})"
       end
     end
 
