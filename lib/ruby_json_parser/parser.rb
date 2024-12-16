@@ -22,7 +22,7 @@ module RubyJsonParser
       # Lexer/Tokenizer that produces tokens
       @lexer = T.let(Lexer.new(source), Lexer)
       # Next token used for predicting productions
-      @lookahead = T.let(Token.new(Token::NONE), Token)
+      @lookahead = T.let(Token.new(Token::NONE, Span.new(Position.new(0), Position.new(0))), Token)
       @errors = T.let([], T::Array[String])
     end
 

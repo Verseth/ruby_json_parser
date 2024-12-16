@@ -35,7 +35,7 @@ module RubyJsonParser
 
     sig { returns(Token) }
     def next
-      return Token.new(Token::END_OF_FILE) unless more_tokens?
+      return Token.new(Token::END_OF_FILE, Span.new(Position.new(0), Position.new(0))) unless more_tokens?
 
       scan_token
     end
@@ -68,8 +68,9 @@ module RubyJsonParser
 
     sig { params(type: Symbol, value: T.nilable(String)).returns(Token) }
     def token(type, value = nil)
+      span = Span.new(Position.new(@start_cursor), Position.new(@cursor - 1))
       @start_cursor = @cursor
-      Token.new(type, value)
+      Token.new(type, span, value)
     end
 
     # Returns the current token value.
@@ -342,7 +343,7 @@ module RubyJsonParser
         when 'u'
           unless accept_chars(Token::HEX_DIGITS, 4)
             swallow_rest_of_the_string
-            return Token.new(Token::ERROR, 'invalid unicode escape')
+            return token(Token::ERROR, 'invalid unicode escape')
           end
 
           advance_chars(4)
@@ -350,7 +351,7 @@ module RubyJsonParser
           value_buffer << [last4.hex].pack('U')
         else
           swallow_rest_of_the_string
-          return Token.new(Token::ERROR, "invalid escape `\\#{char}`")
+          return token(Token::ERROR, "invalid escape `\\#{char}`")
         end
       end
     end

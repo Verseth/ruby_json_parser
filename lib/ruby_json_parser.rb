@@ -4,6 +4,8 @@
 require 'sorbet-runtime'
 
 require_relative 'ruby_json_parser/version'
+require_relative 'ruby_json_parser/position'
+require_relative 'ruby_json_parser/span'
 require_relative 'ruby_json_parser/token'
 require_relative 'ruby_json_parser/lexer'
 require_relative 'ruby_json_parser/ast'
