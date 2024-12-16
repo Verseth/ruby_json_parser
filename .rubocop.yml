@@ -33,3 +33,6 @@ Metrics/ClassLength:
 
 Style/RaiseArgs:
   Enabled: false
+
+Style/ZeroLengthPredicate:
+  Enabled: false

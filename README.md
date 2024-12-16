@@ -1,6 +1,6 @@
 # RubyJsonParser
 
-This library implements a JSON lexer, parser and evaluator in pure Ruby 💎.
+This library implements a JSON lexer, parser, evaluator and syntax highlighter in pure Ruby 💎.
 
 It has been built for educational purposes, to serve as a simple example of what makes parsers tick.
 
@@ -126,6 +126,19 @@ RubyJsonParser.eval('{ "some": ["json", 2e-29, "text"] }')
 
 RubyJsonParser.eval('{ "some" }')
 #! RubyJsonParser::SyntaxError: missing key in object literal for value: `"some"`
+```
+
+### Syntax highlighter
+
+This library implements a JSON syntax highlighter based on a lexer.
+It tokenizes a JSON source string and returns a new string highlighted with [ANSI escape codes](https://en.wikipedia.org/wiki/ANSI_escape_code)
+
+You can use it by calling `RubyJsonParser.highlight` passing in a string
+with JSON source.
+
+```rb
+RubyJsonParser.highlight('{ "foo": 3, "lol": [5, false, null, dupa] }')
+#=> "\e[95m{\e[0m \e[93m\"foo\"\e[0m\e[35m:\e[0m \e[94m3\e[0m\e[35m,\e[0m \e[93m\"lol\"\e[0m\e[35m:\e[0m \e[95m[\e[0m\e[94m5\e[0m\e[35m,\e[0m \e[32m\e[3mfalse\e[0m\e[35m,\e[0m \e[32m\e[3mnull\e[0m\e[35m,\e[0m \e[48;2;153;51;255m\e[9m\e[30mdupa\e[0m\e[95m]\e[0m \e[95m}\e[0m"
 ```
 
 ## Development
