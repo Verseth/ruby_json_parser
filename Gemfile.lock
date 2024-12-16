@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    ruby_json_parser (0.1.0)
+    ruby_json_parser (0.2.0)
       sorbet-runtime (~> 0.5)
 
 GEM
