@@ -1,7 +1,7 @@
 # typed: strong
 # frozen_string_literal: true
 
-class RubyJsonParser
+module RubyJsonParser
   # Contains the definitions of all AST (Abstract Syntax Tree) nodes.
   # AST is the data structure that is returned by the parser.
   module AST

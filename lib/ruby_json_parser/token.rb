@@ -3,7 +3,7 @@
 
 require 'set'
 
-class RubyJsonParser
+module RubyJsonParser
   # Represents a single token (word) produced by the lexer.
   class Token
     extend T::Sig

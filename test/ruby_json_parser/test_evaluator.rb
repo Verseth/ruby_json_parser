@@ -5,7 +5,7 @@
 
 require 'test_helper'
 
-class RubyJsonParser
+module RubyJsonParser
   class EvaluatorTest < Minitest::Test
     extend T::Sig
 

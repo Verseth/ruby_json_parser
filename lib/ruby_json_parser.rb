@@ -13,7 +13,7 @@ require_relative 'ruby_json_parser/evaluator'
 
 # Implements a JSON lexer, parser and evaluator in pure Ruby.
 # Built for educational purposes.
-class RubyJsonParser
+module RubyJsonParser
   extend T::Sig
 
   # JSON syntax error

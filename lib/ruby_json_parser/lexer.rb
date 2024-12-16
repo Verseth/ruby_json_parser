@@ -3,7 +3,7 @@
 
 require_relative 'token'
 
-class RubyJsonParser
+module RubyJsonParser
   # A lexical analyzer (tokenizer) for JSON
   class Lexer
     extend T::Sig

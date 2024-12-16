@@ -3,7 +3,7 @@
 
 require 'test_helper'
 
-class RubyJsonParser
+module RubyJsonParser
   class LexerTest < Minitest::Test
     def test_lex
       expected = [

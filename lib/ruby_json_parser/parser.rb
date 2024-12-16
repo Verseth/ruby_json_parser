@@ -1,7 +1,7 @@
 # typed: strict
 # frozen_string_literal: true
 
-class RubyJsonParser
+module RubyJsonParser
   # JSON parser
   class Parser
     extend T::Sig

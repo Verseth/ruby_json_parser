@@ -3,7 +3,7 @@
 
 require_relative 'token'
 
-class RubyJsonParser
+module RubyJsonParser
   # An evaluator for JSON.
   # Creates Ruby structures based on an JSON AST.
   module Evaluator
