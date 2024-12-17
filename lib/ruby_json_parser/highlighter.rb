@@ -27,6 +27,9 @@ module RubyJsonParser
           previous_end = span.end.char_index + 1
         end
 
+        between_lexemes = T.must source[previous_end..]
+        buff << between_lexemes if between_lexemes.length > 0
+
         buff
       end
 
