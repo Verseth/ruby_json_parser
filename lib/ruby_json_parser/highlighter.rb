@@ -46,7 +46,7 @@ module RubyJsonParser
         when Token::STRING
           [ANSICodes::FOREGROUND_BRIGHT_YELLOW]
         when Token::ERROR
-          [ANSICodes.rgb_background(153, 51, 255), ANSICodes::STRIKE, ANSICodes::FOREGROUND_BLACK]
+          [ANSICodes::BACKGROUND_RED, ANSICodes::STRIKE, ANSICodes::FOREGROUND_BLACK]
         else
           []
         end
